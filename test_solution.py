@@ -1,17 +1,5 @@
 import pytest
-from solution import LinkedListNode, LinkedListIterator, BigInt
-
-
-def test_linked_list_iterable() -> None:
-    a = LinkedListNode(3)
-    b = LinkedListNode(2, next=a)
-    c = LinkedListNode(1, next=b)
-
-    assert list(c) == [1, 2, 3]
-    assert list(b) == [2, 3]
-    assert list(a) == [3]
-    assert list(LinkedListIterator(None)) == []
-    
+from solution import BigInt, Digit
 
 
 @pytest.mark.parametrize(('number', 'expected_list'), [
@@ -34,13 +22,13 @@ def test_bigint_from_int(number, expected_list) -> None:
 
 
 def test_bigint_to_int() -> None:
-    assert BigInt(LinkedListNode(1)).to_int() == 1
+    assert BigInt(Digit(1)).to_int() == 1
     assert BigInt(
-        LinkedListNode(
+        Digit(
             3,
-            next=LinkedListNode(
+            previous=Digit(
                 2,
-                next=LinkedListNode(1)
+                previous=Digit(1)
             )
         )
     ).to_int() == 123

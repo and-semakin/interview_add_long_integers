@@ -1,34 +1,10 @@
-from typing import Any, Optional
+from typing import Any, Optional, Iterable
 
 
-class LinkedListNode:
-    value: Any
-    next: Optional['LinkedListNode']
-
-    def __init__(self, value: Any, next: Optional['LinkedListNode'] = None) -> None:
+class Digit: 
+    def __init__(self, value, previous=None):
         self.value = value
-        self.next = next
-
-    def __iter__(self) -> 'LinkedListNode':
-        return LinkedListIterator(self)
-
-
-class LinkedListIterator:
-    head: Optional[LinkedListNode]
-
-    def __init__(self, head: Optional[LinkedListNode] = None):
-        self.head = head
-
-    def __iter__(self) -> 'LinkedListIterator':
-        return self
-
-    def __next__(self) -> Any:
-        if not self.head:
-            raise StopIteration
-        value = self.head.value
-        self.head = self.head.next
-        return value
-
+        self.previous = previous
 
 class BigInt:
     """Целое число, не ограниченное по размеру.
@@ -36,13 +12,10 @@ class BigInt:
     Работает над связным списком.
     """
 
-    head: LinkedListNode
+    tail: Digit
 
-    def __init__(self, head) -> None:
-        self.head = head
-
-    def __iter__(self) -> 'LinkedListNode':
-        return LinkedListIterator(self.head)
+    def __init__(self, tail) -> None:
+        self.tail = tail
 
     @classmethod
     def from_int(cls, num: int) -> 'BigInt':
@@ -50,22 +23,30 @@ class BigInt:
 
         :param num: целое число
         """
-        head: Optional[LinkedListNode] = None
-        prev: Optional[LinkedListNode] = None
-
+        tail = None 
         for digit in str(num):
-            head = LinkedListNode(int(digit), next=prev)
-            prev = head
+            tail = Digit(int(digit), tail)
+        return cls(tail)
 
-        return cls(head)
+    def __iter__(self) -> Iterable[int]:
+        cur = self.tail
+        while cur.previous:
+            yield cur.value
+            cur = cur.previous
+        yield cur.value
 
     def to_int(self) -> int:
         """Преобразовать BigInt в int.
 
         :returns: целое число
         """
-        str_list = reversed([str(value) for value in self.head])
-        return int(''.join(str_list))
+        return int(
+            ''.join(
+                reversed(
+                    [str(digit) for digit in self]
+                )
+            )
+        )
 
     def __add__(self, other) -> 'BigInt':
         # Написать здесь эффективное решение, работающее над списками
